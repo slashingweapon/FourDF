@@ -27,7 +27,6 @@
 		 	margin-top: 20px;
 		 	margin-bottom: 10px;
 		 	text-align: center;
-		 	text-decoration:underline;
 			user-select: none;
 			-webkit-user-select: none;
 			-moz-user-select: none;
@@ -168,10 +167,21 @@ $(document).ready(function() {
 		if (item) {
 			if (item.series.name == 'rollHistory') {
 				var roll = item.datapoint[0];
-				var sign = (roll>=0) ? '+' : '';
+				var oroll = roll;
 				var times = item.datapoint[1];
-				var output = '' + sign + roll + ' * ' + times;
-				legend.html(output);
+				for (var idx=0; idx<4; idx++) {
+					if (roll>0) {
+						legend.append(dice[2].cloneNode(true));
+						roll--;
+					} else if (roll<0) {
+						legend.append(dice[0].cloneNode(true));
+						roll++;
+					} else if (oroll>0)
+						legend.prepend(dice[1].cloneNode(true));
+					else
+						legend.append(dice[1].cloneNode(true));
+				}
+				legend.append('<span> * '+times+'</span');
 			} else if (item.series.name == 'dieHistory') {
 				var die = dice[item.datapoint[0]+1];
 				var times = item.datapoint[1];
