@@ -37,6 +37,7 @@
 		 }
 		 
 		 #stats {
+		 	margin-top: 20px;
 		 	width: 400px;
 		 	height: 128px;
 		 }
@@ -51,21 +52,40 @@
 	<div id='stats'></stats>
 <script type="text/javascript">
 $(document).ready(function() {
-	var sessionStats = [ 
-		[-4, 0], [-3, 0], [-2, 0], [-1, 0],
-		[0, 0],
-		[1, 0], [2, 0], [3, 0], [4, 0]
-	];
-	var plotOptions = {
-		grid: { borderWidth:0 },
+	var rollHistory = {
+		data: [ 
+				[-4, 0], [-3, 0], [-2, 0], [-1, 0],
+				[0, 0],
+				[1, 0], [2, 0], [3, 0], [4, 0]
+		],
 		yaxis: { show:false },
 		xaxis: { from:-4, to:+4, show:false },
 		bars: { 
 			show:true,
 			fillColor: 'gold',
-			borderColor: 'gold'
+			borderColor: 'goldenrod',
+			align:'center'
 		}
 	};
+	var dieHistory = {
+		data: [
+			[-1, 0],
+			[0, 0],
+			[1, 0]
+		],
+		yaxis: {show:false},
+		xaxis: { from:-1, to:1, show:false },
+		bars: {
+			show: true,
+			fill: true,
+			fillColor: 'green',
+			borderColor: 0,
+		}
+	};
+	var plotOptions = {
+		grid: { borderWidth:0, show:false }
+	};
+	
 	var statDiv = $('#stats');
 	
 	var dice = [
@@ -89,9 +109,10 @@ $(document).ready(function() {
 		for (var idx=0; idx<4; idx++) {
 			var oneRoll = Math.floor(Math.random() * 3);
 			total += oneRoll - 1;
+			dieHistory.data[oneRoll][1] += 1 ;
 			newRoll.appendChild(dice[oneRoll].cloneNode(true));
 		}
-		sessionStats[total+4][1] += 1;
+		rollHistory.data[total+4][1] += 1;
 		var span = document.createElement('span');
 		span.className = 'rollText';
 		span.textContent= '' + ((total>=0) ? ' + ' : ' - ') + Math.abs(total);
@@ -103,7 +124,7 @@ $(document).ready(function() {
 		});
 		
 		// build our plot
-		$.plot(statDiv, [sessionStats], plotOptions);
+		$.plot(statDiv, [rollHistory], plotOptions);
 	});
 	
 	$('#more').hover(
