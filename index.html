@@ -27,6 +27,7 @@
 		 	margin-top: 20px;
 		 	margin-bottom: 10px;
 		 	text-align: center;
+		 	text-decoration:underline;
 			user-select: none;
 			-webkit-user-select: none;
 			-moz-user-select: none;
@@ -41,6 +42,17 @@
 		 	width: 400px;
 		 	height: 128px;
 		 }
+		 
+		 #legend {
+		 	margin-top: 20px;
+		 	height: 64px;
+		 }
+		 
+		 #legend span {
+		 	height: 64px;
+		 	line-height: 64px;
+		 }
+		 
 	</style>
 	<script type="text/javascript" src="jquery-1.8.3.min.js"></script>
 	<script type="text/javascript" src="jquery.flot.js"></script>
@@ -49,44 +61,63 @@
 	<div id='allRolls'>
 	
 	</div>
-	<div id='stats'></stats>
+	<div id='stats'></div>
+	<div id='legend'></div>
 <script type="text/javascript">
 $(document).ready(function() {
 	var rollHistory = {
+		name: 'rollHistory',
 		data: [ 
 				[-4, 0], [-3, 0], [-2, 0], [-1, 0],
 				[0, 0],
 				[1, 0], [2, 0], [3, 0], [4, 0]
 		],
-		yaxis: { show:false },
-		xaxis: { from:-4, to:+4, show:false },
+		yaxis: 1,
+		xaxis: 1,
+		color: 'gold',
 		bars: { 
 			show:true,
-			fillColor: 'gold',
-			borderColor: 'goldenrod',
+			lineWidth: 0,
+			fill: true,
+			fillColor: { colors: [ { opacity: 1.0 }, { opacity: 0.5 } ] },
+			barWidth: .9,
 			align:'center'
 		}
 	};
 	var dieHistory = {
+		name: 'dieHistory',
 		data: [
 			[-1, 0],
 			[0, 0],
 			[1, 0]
 		],
-		yaxis: {show:false},
-		xaxis: { from:-1, to:1, show:false },
+		yaxis: 2,
+		xaxis: 2,
+		color: 'green',
 		bars: {
 			show: true,
-			fill: true,
 			fillColor: 'green',
-			borderColor: 0,
+			borderColor: 'green',
 		}
 	};
 	var plotOptions = {
-		grid: { borderWidth:0, show:false }
+		grid: { 
+			borderWidth:0, 
+			hoverable: true,
+			show:false 
+		},
+		yaxes: [
+			{show:false},
+			{show:false}
+		],
+		xaxes: [
+			{ from:-4, to:4, show:true },
+			{ from:-1, to:1, show:true }
+		]
 	};
 	
 	var statDiv = $('#stats');
+	var legend = $('#legend');
 	
 	var dice = [
 		"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkJDRDkzMEJFQUNFQjExRTBBQUI5Q0EyOTQ4QjhFNzJGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkJDRDkzMEJGQUNFQjExRTBBQUI5Q0EyOTQ4QjhFNzJGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QkNEOTMwQkNBQ0VCMTFFMEFBQjlDQTI5NDhCOEU3MkYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QkNEOTMwQkRBQ0VCMTFFMEFBQjlDQTI5NDhCOEU3MkYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7ttNFAAAAH5klEQVR42uRba4tbRRh+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",
@@ -124,13 +155,31 @@ $(document).ready(function() {
 		});
 		
 		// build our plot
-		$.plot(statDiv, [rollHistory], plotOptions);
+		$.plot(statDiv, [dieHistory, rollHistory], plotOptions);
 	});
 	
 	$('#more').hover(
 		function() { $(this).toggleClass('highlighted',true); },
 		function() { $(this).toggleClass('highlighted',false); }
 	);
+	
+	statDiv.on('plothover', function(evt, pos, item) {
+		legend.html('');
+		if (item) {
+			if (item.series.name == 'rollHistory') {
+				var roll = item.datapoint[0];
+				var sign = (roll>=0) ? '+' : '';
+				var times = item.datapoint[1];
+				var output = '' + sign + roll + ' * ' + times;
+				legend.html(output);
+			} else if (item.series.name == 'dieHistory') {
+				var die = dice[item.datapoint[0]+1];
+				var times = item.datapoint[1];
+				legend.append(die.cloneNode(true));
+				legend.append('<span> * '+times+'</span');
+			}
+		}
+	});
 	
 	$('#more').click();
 });
